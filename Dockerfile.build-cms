@@ -1,0 +1,45 @@
+FROM python:3
+
+RUN apt-get update && apt-get install -y \
+  vim \
+  nano \
+  postgresql-client \
+  sqlite3
+
+RUN curl -sSL https://github.com/kelseyhightower/confd/releases/download/v0.16.0/confd-0.16.0-linux-amd64 -o /usr/local/bin/confd && \
+  chmod +x /usr/local/bin/confd
+
+# Wipe apt cache and logs
+RUN apt-get clean autoclean && apt-get autoremove --yes && rm -rf /var/lib/{apt,dpkg,cache,log}/
+
+# Set the same WORKDIR as default image
+RUN mkdir /var/task
+WORKDIR /var/task
+
+ENV DEPLOY_STATUS=development-aws \
+  APP_NAME=django-cms-3rd \
+  DJANGO_CMS_ADMIN_SECRET_KEY= \
+  DATABASE_DB_NAME= \
+  DATABASE_USER= \
+  DATABASE_PASSWD= \
+  DATABASE_URI= \
+  DATABASE_URI_PORT= \
+  AWS_STORAGE_BUCKET_NAME= \
+  AWS_STORAGE_BUCKET_REGION= \
+  AWS_STORAGE_CUSTOM_DOMAIN= \
+  AWS_STORAGE_BUCKET_KEY_PREFIX=
+
+# Import and Install requirements
+COPY requirements.txt requirements.txt
+RUN pip install -r requirements.txt
+
+# Copy source
+COPY . .
+
+# Just for testing!!
+# RUN ./manage.py createdb "test-django"
+# RUN ./manage.py migrate
+
+
+# Designate default region and default key space
+ENV AWS_REGION=ap-northeast-1 DEFAULT_PREFIX='at-ut/v1'

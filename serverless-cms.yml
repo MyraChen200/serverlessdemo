@@ -1,0 +1,69 @@
+service: django-cms-3rd
+
+package:
+  individually: true
+  exclude:
+     - '**'
+
+plugins:
+  - serverless-plugin-warmup
+  - serverless-wsgi
+
+custom:
+  version: 0.0.0-${self:provider.stage}-${file(./util/sls/timestamp.js):now}
+  stage: ${opt:stage, 'at-ut'}
+  warmup:
+    role: '${ssm:/infra/${self:provider.stage}/v1/lambda/serverless/role-for-vpc-exec}'
+    vpc: false
+    prewarm: true
+    events:
+      - schedule: 'rate(5 minutes)'
+  wsgi:
+    packRequirements: false
+    app: mysite.wsgi.application
+
+provider:
+  name: aws
+  runtime: python3.6
+  stage: ${env:DEPLOY_STAGE, 'at-ut'}
+  region: ap-northeast-1
+  memorySize: 1024
+  tags:
+    version: ${self:custom.version}
+  deploymentBucket:
+    name: ${ssm:/infra/${self:provider.stage}/v1/lambda/serverless/bucket-name}
+  environment:
+    DEPLOY_STATUS: ${self:provider.stage, 'development-aws'}
+    DEPLOY_ENV_BUCKET: ${ssm:/infra/${self:provider.stage}/v1/lambda/serverless/bucket-name}
+    DEPLOY_ENV_KEY: dotenv/${self:service}/${self:provider.stage}/.env
+    DEPLOY_AT: ${file(./util/sls/timestamp.js):now}
+  vpc:
+    securityGroupIds:
+      "Fn::Split":
+        - ","
+        - ${ssm:/infra/${self:provider.stage}/v1/vpc/security-group-ids}
+    subnetIds:
+      "Fn::Split":
+        - ","
+        - ${ssm:/infra/${self:provider.stage}/v1/vpc/subnet-ids}
+
+functions:
+  wsgi:
+    name: ${self:service}-wsgi
+    handler: wsgi_handler.handler
+    package:
+      include:
+        - mysite/**
+        - manage.py
+    role: ${ssm:/infra/${self:provider.stage}/v1/lambda/serverless/role-for-vpc-exec}
+    timeout: 29
+    environment:
+      APP_NAME: 'django-cms-3rd::wsgi'
+    layers:
+      - ${cf:django-${self:provider.stage}.DjangoLayerExport}
+    events:
+      - http: ANY /
+      - http: 'ANY {proxy+}'
+    warmup:
+      enabled: true
+      concurrency: 15

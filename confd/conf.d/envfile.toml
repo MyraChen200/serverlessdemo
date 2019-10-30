@@ -1,0 +1,9 @@
+[template]
+src = "envfile.tmpl"
+dest = ".env"
+keys = [
+  "/database",
+  "/storage",
+  "/cdn",
+  "/encryption"
+]

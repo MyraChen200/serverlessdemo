@@ -1,0 +1,14 @@
+export DATABASE_USER={{ getv "/database/user" }}
+export DATABASE_PASSWD={{ getv "/database/passwd" }}
+export DATABASE_DB_NAME={{ getv "/database/db-name" }}
+
+export DATABASE_URI={{ getv "/database/endpoint"}} 
+export DATABASE_USER={{ getv "/database/user"}} 
+export DATABASE_PASSWD={{ getv "/database/passwd"}} 
+export DATABASE_DB_NAME={{ getv "/database/db-name"}} 
+export AWS_STORAGE_BUCKET_NAME={{ getv "/storage/bucket-name"}} 
+export AWS_STORAGE_BUCKET_REGION={{ getv "/storage/bucket-region"}} 
+export AWS_STORAGE_CUSTOM_DOMAIN={{ getv "/cdn/endpoint"}} 
+export AWS_STORAGE_BUCKET_KEY_PREFIX={{ getv "/storage/object-prefix"}} 
+export AWS_KMS_SECRET_KEY={{ getv "/encryption/kms-key-id"}} 
+export AWS_KMS_REGION={{ getv "/encryption/kms-region"}} 

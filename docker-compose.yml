@@ -1,0 +1,13 @@
+version: '3'
+services:
+  admin:
+    container_name: "django-admin-test"
+    # image: django-admin-test
+    build:
+      context: .
+      dockerfile: Dockerfile.build-cms
+    environment:
+      # provide your own AWS_PROFILE should you need it, otherwise using default
+      AWS_PROFILE: ${AWS_PROFILE}
+    command: >
+      bash

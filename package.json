@@ -1,0 +1,17 @@
+{
+  "name": "test-django",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "dependencies": {
+    "serverless-plugin-warmup": "^4.7.1-rc.1",
+    "serverless-python-requirements": "^5.0.0",
+    "serverless-wsgi": "^1.7.3"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC"
+}
